@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ../..:/workspaces:cached
+    env_file:
+      - .app.env
+    command: sleep infinity

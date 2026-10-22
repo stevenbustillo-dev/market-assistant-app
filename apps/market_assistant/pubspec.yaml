@@ -1,0 +1,39 @@
+name: market_assistant
+description: "Market Assistant is a Flutter application that helps users manage their market activities efficiently."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ui:
+    path: ../../packages/ui
+
+  cupertino_icons: ^1.0.8
+  go_router: ^18.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Rakkas
+      fonts:
+        - asset: assets/fonts/Rakkas/Rakkas-Regular.ttf
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf
+        - asset: assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf
+    - family: Source Code Pro
+      fonts:
+        - asset: assets/fonts/Source_Code_Pro/SourceCodePro-VariableFont_wght.ttf
+        - asset: assets/fonts/Source_Code_Pro/SourceCodePro-Italic-VariableFont_wght.ttf
