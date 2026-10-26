@@ -7,4 +7,6 @@ const Map<UiElement, double> elements = {
   UiElement.lg: 32,
   UiElement.xl: 40,
   UiElement.xl2: 48,
+  UiElement.xl3: 64,
+  UiElement.xl4: 80,
 };

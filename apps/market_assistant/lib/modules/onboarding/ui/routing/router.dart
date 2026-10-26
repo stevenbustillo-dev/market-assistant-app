@@ -13,7 +13,7 @@ StatefulShellRoute buildOnboardingRouter() => StatefulShellRoute.indexedStack(
         GoRoute(
           path: '/onboarding/welcome',
           builder: (context, state) =>
-              WelcomeView(viewModel: OnboardingViewModel()),
+              WelcomeView(viewModel: OnboardingViewModel(context: context)),
         ),
       ],
     ),

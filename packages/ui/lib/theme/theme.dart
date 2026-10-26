@@ -103,7 +103,7 @@ enum UiRadius { none, xs, sm, md, lg, xl, full }
 
 enum UiSpacing { none, xs, sm, md, lg, xl }
 
-enum UiElement { xs, sm, md, lg, xl, xl2 }
+enum UiElement { xs, sm, md, lg, xl, xl2, xl3, xl4 }
 
 enum UiShadow { none, xs, sm, md, lg, xl }
 
