@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 final indexRoute = GoRoute(
@@ -5,4 +6,5 @@ final indexRoute = GoRoute(
   // Redirect to the onboarding welcome page for the first time or to the
   // dashboard page if the user has already completed onboarding.
   redirect: (context, state) => '/onboarding/welcome',
+  builder: (context, state) => const SizedBox.shrink(),
 );

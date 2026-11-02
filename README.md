@@ -42,12 +42,12 @@ flutter pub get
 
 ```bash
 # android
-flutter create --platforms=android ./apps/<app_name>
+flutter create --platforms=android ./apps/<app_name> --org com.stevenbustillo
 ```
 
 ```bash
 # ios
-flutter create --platforms=ios ./apps/<app_name>
+flutter create --platforms=ios ./apps/<app_name> --org com.stevenbustillo
 ```
 
 ## Documentation
