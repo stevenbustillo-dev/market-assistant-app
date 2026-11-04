@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ui/ui.dart';
 
+enum ComparisonViewState { initial, adding, calculable }
+
 abstract interface class ComparisonViewModel {
+  ComparisonViewState get state;
   void handleAddProduct();
   void handleRemoveProduct(int index);
   void handleClearProducts();
@@ -31,22 +34,14 @@ final class ComparisonView extends StatelessWidget {
             ),
           ),
           child: SafeArea(
+            top: false,
             child: Column(
               children: [
-                Padding(
-                  padding: EdgeInsetsGeometry.symmetric(
-                    vertical: theme.getSpacing(UiSpacing.md),
-                    horizontal: theme.getSpacing(UiSpacing.lg),
-                  ),
-                  child: Row(
-                    children: [
-                      UiIcon(icon: Icons.currency_exchange, size: UiElement.md),
-                      Spacer(),
-                      UiLabel(text: 'Calculadora', style: UiFontStyle.caption),
-                      Spacer(),
-                      SizedBox(width: theme.getElement(UiElement.md)),
-                    ],
-                  ),
+                UiHeader(
+                  priority: UiPriority.primary,
+                  title: 'Calculadora',
+                  leadingIcon: Icons.currency_exchange,
+                  hasOffset: true,
                 ),
               ],
             ),

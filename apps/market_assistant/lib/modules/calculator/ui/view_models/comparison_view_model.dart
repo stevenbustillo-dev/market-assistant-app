@@ -4,6 +4,8 @@ import '../states/calculator_state.dart';
 import '../views/comparison_view.dart';
 
 final class DefaultComparisonViewModel implements ComparisonViewModel {
+  ComparisonViewState get state => ComparisonViewState.initial;
+
   final BuildContext _context;
   final CalculatorState _state;
 
