@@ -16,16 +16,16 @@ final class DefaultComparisonViewModel implements ComparisonViewModel {
 
   @override
   void handleAddProduct() {
-    // TODO: implement handleAddProduct
+    print('handleAddProduct');
   }
 
   @override
   void handleClearProducts() {
-    // TODO: implement handleClearProducts
+    print('handleClearProducts');
   }
 
   @override
   void handleRemoveProduct(int index) {
-    // TODO: implement handleRemoveProduct
+    print('handleRemoveProduct: $index');
   }
 }

@@ -43,11 +43,73 @@ final class ComparisonView extends StatelessWidget {
                   leadingIcon: Icons.currency_exchange,
                   hasOffset: true,
                 ),
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsetsGeometry.all(
+                      theme.getSpacing(UiSpacing.md),
+                    ),
+                    child: Column(
+                      spacing: theme.getSpacing(UiSpacing.md),
+                      children: [
+                        ..._buildInitialState(context),
+                        SizedBox(
+                          width: double.infinity,
+                          child: UiButton(
+                            priority: UiPriority.primary,
+                            vertical: UiSpacing.md,
+                            radius: UiRadius.xl,
+                            onPressed: _viewModel.handleAddProduct,
+                            child: UiLabel(
+                              text: 'Agregar producto',
+                              priority: UiPriority.primary,
+                              style: UiFontStyle.caption,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildInitialState(BuildContext context) {
+    final theme = context.uiTheme;
+
+    return [
+      Spacer(),
+      Center(
+        child: UiButton(
+          onPressed: _viewModel.handleAddProduct,
+          priority: UiPriority.primary,
+          vertical: UiSpacing.xl,
+          horizontal: UiSpacing.xl,
+          radius: UiRadius.full,
+          child: UiIcon(
+            icon: Icons.add_shopping_cart,
+            size: UiElement.xl4,
+            priority: UiPriority.primary,
+          ),
+        ),
+      ),
+      SizedBox(height: theme.getSpacing(UiSpacing.md)),
+      Column(
+        spacing: theme.getSpacing(UiSpacing.xs),
+        children: [
+          UiLabel(text: 'Agrega productos', style: UiFontStyle.caption),
+          UiLabel(
+            text: 'Agrega productos a la calculadora para comparar precios.',
+            style: UiFontStyle.body,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      Spacer(flex: 2),
+    ];
   }
 }
