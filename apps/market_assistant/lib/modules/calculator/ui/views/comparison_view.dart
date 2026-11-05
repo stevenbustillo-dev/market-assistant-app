@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:ui/ui.dart';
 
+import '../../domain/product.dart';
+import '../../domain/measurement.dart';
+
+import '../widgets/success_card.dart';
+
 enum ComparisonViewState { initial, adding, calculable }
 
 abstract interface class ComparisonViewModel {
   ComparisonViewState get state;
+  Product? get bestProduct;
+  Measurement? get baseMeasurement;
   void handleAddProduct();
   void handleRemoveProduct(int index);
   void handleClearProducts();
@@ -46,12 +53,16 @@ final class ComparisonView extends StatelessWidget {
                 Flexible(
                   child: Padding(
                     padding: EdgeInsetsGeometry.all(
-                      theme.getSpacing(UiSpacing.md),
+                      theme.getSpacing(UiSpacing.lg),
                     ),
                     child: Column(
-                      spacing: theme.getSpacing(UiSpacing.md),
+                      spacing: theme.getSpacing(UiSpacing.lg),
                       children: [
-                        ..._buildInitialState(context),
+                        if (_viewModel.state == ComparisonViewState.initial)
+                          _buildInitialState(context)
+                        else
+                          _buildCalculableState(context),
+
                         SizedBox(
                           width: double.infinity,
                           child: UiButton(
@@ -78,38 +89,60 @@ final class ComparisonView extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildInitialState(BuildContext context) {
+  Widget _buildInitialState(BuildContext context) {
     final theme = context.uiTheme;
 
-    return [
-      Spacer(),
-      Center(
-        child: UiButton(
-          onPressed: _viewModel.handleAddProduct,
-          priority: UiPriority.primary,
-          vertical: UiSpacing.xl,
-          horizontal: UiSpacing.xl,
-          radius: UiRadius.full,
-          child: UiIcon(
-            icon: Icons.add_shopping_cart,
-            size: UiElement.xl4,
-            priority: UiPriority.primary,
-          ),
-        ),
-      ),
-      SizedBox(height: theme.getSpacing(UiSpacing.md)),
-      Column(
-        spacing: theme.getSpacing(UiSpacing.xs),
+    return Flexible(
+      child: Column(
         children: [
-          UiLabel(text: 'Agrega productos', style: UiFontStyle.caption),
-          UiLabel(
-            text: 'Agrega productos a la calculadora para comparar precios.',
-            style: UiFontStyle.body,
-            textAlign: TextAlign.center,
+          Spacer(),
+          Center(
+            child: UiButton(
+              onPressed: _viewModel.handleAddProduct,
+              priority: UiPriority.primary,
+              vertical: UiSpacing.xl,
+              horizontal: UiSpacing.xl,
+              radius: UiRadius.full,
+              child: UiIcon(
+                icon: Icons.add_shopping_cart,
+                size: UiElement.xl4,
+                priority: UiPriority.primary,
+              ),
+            ),
+          ),
+          SizedBox(height: theme.getSpacing(UiSpacing.md)),
+          Column(
+            spacing: theme.getSpacing(UiSpacing.xs),
+            children: [
+              UiLabel(text: 'Agrega productos', style: UiFontStyle.caption),
+              UiLabel(
+                text:
+                    'Agrega productos a la calculadora para comparar precios.',
+                style: UiFontStyle.body,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          Spacer(flex: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalculableState(BuildContext context) {
+    final theme = context.uiTheme;
+
+    return Flexible(
+      child: Column(
+        spacing: theme.getSpacing(UiSpacing.md),
+        children: [
+          SuccessCard(
+            onAddPressed: _viewModel.handleAddProduct,
+            product: _viewModel.bestProduct,
+            baseMeasurement: _viewModel.baseMeasurement,
           ),
         ],
       ),
-      Spacer(flex: 2),
-    ];
+    );
   }
 }

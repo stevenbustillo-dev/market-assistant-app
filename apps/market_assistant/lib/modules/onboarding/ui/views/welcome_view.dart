@@ -30,7 +30,7 @@ final class WelcomeView extends StatelessWidget {
           ),
           child: SafeArea(
             child: Padding(
-              padding: EdgeInsetsGeometry.all(theme.getSpacing(UiSpacing.md)),
+              padding: EdgeInsetsGeometry.all(theme.getSpacing(UiSpacing.lg)),
               child: Column(
                 children: [
                   Spacer(),
