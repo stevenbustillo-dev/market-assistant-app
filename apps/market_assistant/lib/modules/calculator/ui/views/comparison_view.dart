@@ -12,6 +12,7 @@ abstract interface class ComparisonViewModel {
   ComparisonViewState get state;
   Product? get bestProduct;
   Measurement? get baseMeasurement;
+  List<Product> get products;
   void handleAddProduct();
   void handleRemoveProduct(int index);
   void handleClearProducts();
@@ -140,6 +141,40 @@ final class ComparisonView extends StatelessWidget {
             onAddPressed: _viewModel.handleAddProduct,
             product: _viewModel.bestProduct,
             baseMeasurement: _viewModel.baseMeasurement,
+          ),
+          Row(
+            spacing: theme.getSpacing(UiSpacing.md),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              UiLabel(text: 'Comparando', style: UiFontStyle.caption),
+              UiButton(
+                onPressed: _viewModel.handleClearProducts,
+                vertical: UiSpacing.xs,
+                horizontal: UiSpacing.sm,
+                priority: UiPriority.danger,
+                radius: UiRadius.full,
+                alpha: true,
+                child: Row(
+                  spacing: theme.getSpacing(UiSpacing.xs),
+                  children: [
+                    UiLabel(text: 'Limpiar todos', priority: UiPriority.danger),
+                    UiIcon(
+                      icon: Icons.cleaning_services,
+                      priority: UiPriority.danger,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Flexible(
+            child: ListView.separated(
+              itemBuilder: (context, index) =>
+                  UiLabel(text: _viewModel.products[index].description),
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: theme.getSpacing(UiSpacing.sm)),
+              itemCount: _viewModel.products.length,
+            ),
           ),
         ],
       ),

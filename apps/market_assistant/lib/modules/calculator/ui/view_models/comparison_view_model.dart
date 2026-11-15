@@ -18,6 +18,22 @@ final class DefaultComparisonViewModel implements ComparisonViewModel {
     measurement: measurementCategories[0].measurements[2],
   );
   Measurement? get baseMeasurement => measurementCategories[0].measurements[1];
+  List<Product> get products => [
+    Product(
+      description: 'Producto 1',
+      price: 200,
+      unitPerPackage: 1,
+      amountPerUnit: 400,
+      measurement: measurementCategories[0].measurements[2],
+    ),
+    Product(
+      description: 'Producto 2',
+      price: 220,
+      unitPerPackage: 1,
+      amountPerUnit: 410,
+      measurement: measurementCategories[0].measurements[2],
+    ),
+  ];
 
   final BuildContext _context;
   final CalculatorState _state;
