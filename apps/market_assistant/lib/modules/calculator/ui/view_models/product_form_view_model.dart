@@ -6,6 +6,7 @@ import '../../domain/product.dart';
 import '../../domain/measurement.dart';
 import '../../domain/measurement_repository.dart';
 
+import '../states/calculator_state.dart';
 import '../views/product_form_view.dart';
 
 final class DefaultProductFormViewModel extends ChangeNotifier
@@ -50,10 +51,12 @@ final class DefaultProductFormViewModel extends ChangeNotifier
   bool get isEditing => _isEditing;
 
   final BuildContext _context;
+  final CalculatorState _state;
   final MeasurementRepository _measurementRepository;
 
   DefaultProductFormViewModel({
     required this._context,
+    required this._state,
     required this._measurementRepository,
   }) : _categories = _measurementRepository.getAllMeasurementCategory(),
        _descriptionCtrl = TextEditingController(text: ''),
@@ -78,10 +81,18 @@ final class DefaultProductFormViewModel extends ChangeNotifier
   @override
   void handleAddProduct() {
     final description = _descriptionCtrl.text.trim();
-    final unitPerPackage = int.parse(_packageUnitsCtrl.text.trim());
-    final amountPerUnit = double.parse(_amountCtrl.text.trim());
+    final unitPerPackage = int.parse(
+      _packageUnitsCtrl.text.trim().isEmpty
+          ? '0'
+          : _packageUnitsCtrl.text.trim(),
+    );
+    final amountPerUnit = double.parse(
+      _amountCtrl.text.trim().isEmpty ? '0' : _amountCtrl.text.trim(),
+    );
     final measurement = _measureCtrl.value[0];
-    final price = double.parse(_priceCtrl.text.trim());
+    final price = double.parse(
+      _priceCtrl.text.trim().isEmpty ? '0' : _priceCtrl.text.trim(),
+    );
 
     final product = Product(
       description: description,

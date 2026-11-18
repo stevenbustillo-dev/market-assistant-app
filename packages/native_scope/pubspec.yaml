@@ -1,0 +1,17 @@
+name: native_scope
+description: "Minimalistic zero dependencies for state selectors for consuming slices of data"
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
