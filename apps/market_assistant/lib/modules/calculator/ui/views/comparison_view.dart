@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ui/ui.dart';
 
 import '../../domain/product.dart';
@@ -151,17 +151,13 @@ final class ComparisonView extends StatelessWidget {
                 onPressed: _viewModel.handleClearProducts,
                 vertical: UiSpacing.xs,
                 horizontal: UiSpacing.sm,
-                priority: UiPriority.danger,
                 radius: UiRadius.full,
                 alpha: true,
                 child: Row(
                   spacing: theme.getSpacing(UiSpacing.xs),
                   children: [
-                    UiLabel(text: 'Limpiar todos', priority: UiPriority.danger),
-                    UiIcon(
-                      icon: Icons.cleaning_services,
-                      priority: UiPriority.danger,
-                    ),
+                    UiLabel(text: 'Limpiar todos'),
+                    UiIcon(icon: Icons.cleaning_services),
                   ],
                 ),
               ),

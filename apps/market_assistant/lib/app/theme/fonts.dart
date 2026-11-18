@@ -54,7 +54,7 @@ const Map<UiFontStyle, UiFonts> fonts = {
   UiFontStyle.hint: UiFonts(
     family: 'Montserrat',
     size: 14,
-    height: 24,
+    height: 20,
     weight: FontWeight.w400,
     style: FontStyle.normal,
   ),

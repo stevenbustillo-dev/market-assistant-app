@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../domain/product.dart';
 import '../../domain/measurement.dart';
@@ -45,7 +46,7 @@ final class DefaultComparisonViewModel implements ComparisonViewModel {
 
   @override
   void handleAddProduct() {
-    print('handleAddProduct');
+    _context.push('/calculator/product');
   }
 
   @override

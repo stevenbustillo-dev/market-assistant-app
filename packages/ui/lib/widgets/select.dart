@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../theme/theme.dart';
 
@@ -33,6 +33,8 @@ final class UiSelect<T> extends StatefulWidget {
   final Widget Function(bool focused)? prefix;
   final Widget Function(bool focused)? suffix;
 
+  final void Function(List<T> elements)? onChange;
+
   const UiSelect({
     super.key,
 
@@ -54,6 +56,8 @@ final class UiSelect<T> extends StatefulWidget {
 
     this.prefix,
     this.suffix,
+
+    this.onChange,
   });
 
   @override
@@ -167,6 +171,7 @@ final class _UiSelectState<T> extends State<UiSelect<T>> {
         ..clear()
         ..addAll(_selectedElements);
       _selectedElements.clear();
+      widget.onChange?.call(_currentController.value);
     });
     Navigator.of(context).pop();
   }
