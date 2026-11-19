@@ -1,61 +1,63 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../domain/product.dart';
-import '../../domain/measurement.dart';
+import '../states/comparison_state.dart';
 
-import '../states/calculator_state.dart';
-import '../views/comparison_view.dart';
+import './calculator_view_model.dart';
 
-import '../../infrastructure/data/measurements.dart';
+final class ComparisonViewModel {
+  final ValueNotifier<ComparisonState> _state;
 
-final class DefaultComparisonViewModel implements ComparisonViewModel {
-  ComparisonViewState get state => ComparisonViewState.adding;
-  Product? get bestProduct => Product(
-    description: 'Producto 1',
-    price: 200,
-    unitPerPackage: 1,
-    amountPerUnit: 400,
-    measurement: measurementCategories[0].measurements[2],
-  );
-  Measurement? get baseMeasurement => measurementCategories[0].measurements[1];
-  List<Product> get products => [
-    Product(
-      description: 'Producto 1',
-      price: 200,
-      unitPerPackage: 1,
-      amountPerUnit: 400,
-      measurement: measurementCategories[0].measurements[2],
-    ),
-    Product(
-      description: 'Producto 2',
-      price: 220,
-      unitPerPackage: 1,
-      amountPerUnit: 410,
-      measurement: measurementCategories[0].measurements[2],
-    ),
-  ];
+  ValueNotifier<ComparisonState> get state => _state;
 
   final BuildContext _context;
-  final CalculatorState _state;
+  final CalculatorViewModel _calculatorViewModel;
 
-  const DefaultComparisonViewModel({
+  ComparisonViewModel({
     required this._context,
-    required this._state,
-  });
+    required this._calculatorViewModel,
+  }) : _state = ValueNotifier<ComparisonState>(
+         ComparisonState(
+           viewState: ComparisonViewState.initial,
+           bestProduct: null,
+           baseMeasurement: null,
+           products: [],
+         ),
+       );
 
-  @override
+  void initState() {
+    _calculatorViewModel.state.addListener(_listenCalculatorState);
+  }
+
+  void _listenCalculatorState() {
+    final ComparisonViewState viewState =
+        _calculatorViewModel.state.value.products.isEmpty
+        ? ComparisonViewState.initial
+        : _calculatorViewModel.state.value.products.length > 1
+        ? ComparisonViewState.calculable
+        : ComparisonViewState.adding;
+
+    _state.value = ComparisonState(
+      viewState: viewState,
+      bestProduct: _calculatorViewModel.state.value.bestProduct,
+      baseMeasurement: _calculatorViewModel.state.value.baseMeasurement,
+      products: _calculatorViewModel.state.value.products,
+    );
+  }
+
   void handleAddProduct() {
     _context.push('/calculator/product');
   }
 
-  @override
   void handleClearProducts() {
-    print('handleClearProducts');
+    _calculatorViewModel.removeAllProducts();
   }
 
-  @override
   void handleRemoveProduct(int index) {
-    print('handleRemoveProduct: $index');
+    _calculatorViewModel.removeProduct(index);
+  }
+
+  void dispose() {
+    _calculatorViewModel.state.removeListener(_listenCalculatorState);
   }
 }

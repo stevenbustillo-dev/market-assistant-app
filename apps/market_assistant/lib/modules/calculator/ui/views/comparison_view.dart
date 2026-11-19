@@ -1,89 +1,79 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:native_scope/native_scope.dart';
 import 'package:ui/ui.dart';
 
 import '../../domain/product.dart';
-import '../../domain/measurement.dart';
+
+import '../states/comparison_state.dart';
+import '../view_models/comparison_view_model.dart';
 
 import '../widgets/success_card.dart';
 
-enum ComparisonViewState { initial, adding, calculable }
-
-abstract interface class ComparisonViewModel {
-  ComparisonViewState get state;
-  Product? get bestProduct;
-  Measurement? get baseMeasurement;
-  List<Product> get products;
-  void handleAddProduct();
-  void handleRemoveProduct(int index);
-  void handleClearProducts();
-}
-
 final class ComparisonView extends StatelessWidget {
-  final ComparisonViewModel _viewModel;
-
-  const ComparisonView({super.key, required this._viewModel});
+  const ComparisonView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = ScopeInjector.read<ComparisonViewModel>(context);
     final theme = context.uiTheme;
 
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                theme.getColors(UiPriority.neutral).background,
-                theme.getColors(UiPriority.neutral).surface,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              theme.getColors(UiPriority.neutral).background,
+              theme.getColors(UiPriority.neutral).surface,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          child: SafeArea(
-            top: false,
-            child: Column(
-              children: [
-                UiHeader(
-                  priority: UiPriority.primary,
-                  title: 'Calculadora',
-                  leadingIcon: Icons.currency_exchange,
-                  hasOffset: true,
-                ),
-                Flexible(
-                  child: Padding(
-                    padding: EdgeInsetsGeometry.all(
-                      theme.getSpacing(UiSpacing.lg),
-                    ),
-                    child: Column(
-                      spacing: theme.getSpacing(UiSpacing.lg),
-                      children: [
-                        if (_viewModel.state == ComparisonViewState.initial)
-                          _buildInitialState(context)
-                        else
-                          _buildCalculableState(context),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              UiHeader(
+                priority: UiPriority.primary,
+                title: 'Calculadora',
+                leadingIcon: Icons.currency_exchange,
+                hasOffset: true,
+              ),
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsetsGeometry.all(
+                    theme.getSpacing(UiSpacing.lg),
+                  ),
+                  child: Column(
+                    spacing: theme.getSpacing(UiSpacing.lg),
+                    children: [
+                      ScopeBuilder<ComparisonState, ComparisonViewState>(
+                        selector: (state) => state.viewState,
+                        builder: (context, value, child) =>
+                            value == ComparisonViewState.initial
+                            ? _buildInitialState(context)
+                            : _buildCalculableState(context),
+                      ),
 
-                        SizedBox(
-                          width: double.infinity,
-                          child: UiButton(
+                      SizedBox(
+                        width: double.infinity,
+                        child: UiButton(
+                          priority: UiPriority.primary,
+                          vertical: UiSpacing.md,
+                          radius: UiRadius.xl,
+                          onPressed: viewModel.handleAddProduct,
+                          child: UiLabel(
+                            text: 'Agregar producto',
                             priority: UiPriority.primary,
-                            vertical: UiSpacing.md,
-                            radius: UiRadius.xl,
-                            onPressed: _viewModel.handleAddProduct,
-                            child: UiLabel(
-                              text: 'Agregar producto',
-                              priority: UiPriority.primary,
-                              style: UiFontStyle.caption,
-                            ),
+                            style: UiFontStyle.caption,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -91,6 +81,7 @@ final class ComparisonView extends StatelessWidget {
   }
 
   Widget _buildInitialState(BuildContext context) {
+    final viewModel = ScopeInjector.read<ComparisonViewModel>(context);
     final theme = context.uiTheme;
 
     return Flexible(
@@ -99,7 +90,7 @@ final class ComparisonView extends StatelessWidget {
           Spacer(),
           Center(
             child: UiButton(
-              onPressed: _viewModel.handleAddProduct,
+              onPressed: viewModel.handleAddProduct,
               priority: UiPriority.primary,
               vertical: UiSpacing.xl,
               horizontal: UiSpacing.xl,
@@ -131,16 +122,20 @@ final class ComparisonView extends StatelessWidget {
   }
 
   Widget _buildCalculableState(BuildContext context) {
+    final viewModel = ScopeInjector.read<ComparisonViewModel>(context);
     final theme = context.uiTheme;
 
     return Flexible(
       child: Column(
         spacing: theme.getSpacing(UiSpacing.md),
         children: [
-          SuccessCard(
-            onAddPressed: _viewModel.handleAddProduct,
-            product: _viewModel.bestProduct,
-            baseMeasurement: _viewModel.baseMeasurement,
+          ScopeBuilder<ComparisonState, ComparisonState>(
+            selector: (state) => state,
+            builder: (context, value, child) => SuccessCard(
+              onAddPressed: viewModel.handleAddProduct,
+              product: value.bestProduct,
+              baseMeasurement: value.baseMeasurement,
+            ),
           ),
           Row(
             spacing: theme.getSpacing(UiSpacing.md),
@@ -148,7 +143,7 @@ final class ComparisonView extends StatelessWidget {
             children: [
               UiLabel(text: 'Comparando', style: UiFontStyle.caption),
               UiButton(
-                onPressed: _viewModel.handleClearProducts,
+                onPressed: viewModel.handleClearProducts,
                 vertical: UiSpacing.xs,
                 horizontal: UiSpacing.sm,
                 radius: UiRadius.full,
@@ -164,12 +159,15 @@ final class ComparisonView extends StatelessWidget {
             ],
           ),
           Flexible(
-            child: ListView.separated(
-              itemBuilder: (context, index) =>
-                  UiLabel(text: _viewModel.products[index].description),
-              separatorBuilder: (context, index) =>
-                  SizedBox(height: theme.getSpacing(UiSpacing.sm)),
-              itemCount: _viewModel.products.length,
+            child: ScopeBuilder<ComparisonState, List<Product>>(
+              selector: (state) => state.products,
+              builder: (context, value, child) => ListView.separated(
+                itemBuilder: (context, index) =>
+                    UiLabel(text: value[index].description),
+                separatorBuilder: (context, index) =>
+                    SizedBox(height: theme.getSpacing(UiSpacing.sm)),
+                itemCount: value.length,
+              ),
             ),
           ),
         ],

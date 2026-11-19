@@ -6,7 +6,7 @@ import '../../domain/product.dart';
 import '../../domain/measurement.dart';
 import '../../domain/measurement_repository.dart';
 
-import '../states/calculator_state.dart';
+import 'calculator_view_model.dart';
 import '../views/product_form_view.dart';
 
 final class DefaultProductFormViewModel extends ChangeNotifier
@@ -51,7 +51,7 @@ final class DefaultProductFormViewModel extends ChangeNotifier
   bool get isEditing => _isEditing;
 
   final BuildContext _context;
-  final CalculatorState _state;
+  final CalculatorViewModel _state;
   final MeasurementRepository _measurementRepository;
 
   DefaultProductFormViewModel({

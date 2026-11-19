@@ -1,7 +1,16 @@
-import 'package:flutter/widgets.dart';
+import '../../domain/product.dart';
+import '../../domain/measurement.dart';
 
-import '../models/calculator_data.dart';
+final class CalculatorState {
+  final MeasurementCategory? category;
+  final Measurement? baseMeasurement;
+  final List<Product> products;
+  final Product? bestProduct;
 
-final class CalculatorState extends ValueNotifier<CalculatorData> {
-  CalculatorState() : super(const CalculatorData());
+  const CalculatorState({
+    required this.category,
+    required this.baseMeasurement,
+    required this.products,
+    required this.bestProduct,
+  });
 }
