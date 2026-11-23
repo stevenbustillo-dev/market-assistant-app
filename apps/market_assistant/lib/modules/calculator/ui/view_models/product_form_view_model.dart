@@ -1,112 +1,108 @@
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:ui/ui.dart';
 
-import '../../domain/product.dart';
 import '../../domain/measurement.dart';
 import '../../domain/measurement_repository.dart';
 
-import 'calculator_view_model.dart';
-import '../views/product_form_view.dart';
+import '../models/product_form_error_model.dart';
 
-final class DefaultProductFormViewModel extends ChangeNotifier
-    implements ProductFormViewModel {
-  final List<MeasurementCategory> _categories;
-  @override
-  List<MeasurementCategory> get categories => _categories;
+import '../controllers/product_form_controller.dart';
 
-  List<Measurement>? _measurements;
-  @override
-  List<Measurement>? get measurements => _measurements;
-  @override
-  bool get hasMeasurements =>
-      _measurements != null && _measurements!.isNotEmpty;
+import '../states/product_form_state.dart';
 
-  final TextEditingController _descriptionCtrl;
-  @override
-  TextEditingController get descriptionCtrl => _descriptionCtrl;
+import './calculator_view_model.dart';
 
-  final TextEditingController _packageUnitsCtrl;
-  @override
-  TextEditingController get packageUnitsCtrl => _packageUnitsCtrl;
+final class ProductFormViewModel {
+  final ValueNotifier<ProductFormState> _state;
 
-  final TextEditingController _amountCtrl;
-  @override
-  TextEditingController get amountCtrl => _amountCtrl;
+  ValueNotifier<ProductFormState> get state => _state;
 
-  final ListEditingController<MeasurementCategory> _categoryCtrl;
-  @override
-  ListEditingController<MeasurementCategory> get categoryCtrl => _categoryCtrl;
+  final ProductFormController _formController;
 
-  final ListEditingController<Measurement> _measureCtrl;
-  @override
-  ListEditingController<Measurement> get measureCtrl => _measureCtrl;
-
-  final TextEditingController _priceCtrl;
-  @override
-  TextEditingController get priceCtrl => _priceCtrl;
-
-  final bool _isEditing;
-  @override
-  bool get isEditing => _isEditing;
+  ProductFormController get formController => _formController;
 
   final BuildContext _context;
-  final CalculatorViewModel _state;
+  final CalculatorViewModel _calculatorViewModel;
   final MeasurementRepository _measurementRepository;
 
-  DefaultProductFormViewModel({
+  ProductFormViewModel({
     required this._context,
-    required this._state,
+    required this._calculatorViewModel,
     required this._measurementRepository,
-  }) : _categories = _measurementRepository.getAllMeasurementCategory(),
-       _descriptionCtrl = TextEditingController(text: ''),
-       _packageUnitsCtrl = TextEditingController(text: '1'),
-       _amountCtrl = TextEditingController(text: ''),
-       _categoryCtrl = ListEditingController(),
-       _measureCtrl = ListEditingController(),
-       _priceCtrl = TextEditingController(text: ''),
-       _isEditing = false;
+  }) : _state = ValueNotifier<ProductFormState>(
+         const ProductFormState(
+           categories: [],
+           measurements: [],
+           hasMeasurements: false,
+           isEditing: false,
+           error: ProductFormErrorModel(
+             description: null,
+             packageUnits: null,
+             amount: null,
+             category: null,
+             measure: null,
+             price: null,
+           ),
+         ),
+       ),
+       _formController = ProductFormController();
 
-  @override
-  void handleSelectCategory(List<MeasurementCategory> elements) {
-    _measureCtrl.clear();
-    if (elements.isEmpty) {
-      _measurements = null;
-    } else {
-      _measurements = elements[0].measurements;
-    }
-    notifyListeners();
+  void _setError(
+    ProductFormErrorModel Function(ProductFormErrorModel error) setError,
+  ) {
+    _state.value = _state.value = ProductFormState(
+      categories: _state.value.categories,
+      measurements: _state.value.measurements,
+      hasMeasurements: _state.value.hasMeasurements,
+      isEditing: _state.value.isEditing,
+      error: setError(_state.value.error),
+    );
   }
 
-  @override
+  void initState() {
+    _formController.initState(_setError);
+
+    _state.value = ProductFormState(
+      categories: _measurementRepository.getAllMeasurementCategory(),
+      measurements: _state.value.measurements,
+      hasMeasurements: _state.value.hasMeasurements,
+      isEditing: _state.value.isEditing,
+      error: _state.value.error,
+    );
+    _calculatorViewModel.state.addListener(_listenCalculatorState);
+  }
+
+  void _listenCalculatorState() {}
+
+  void handleSelectCategory(List<MeasurementCategory> elements) {
+    formController.measureCtrl.clear();
+    final List<Measurement> measurements = elements.isEmpty
+        ? []
+        : elements[0].measurements;
+
+    _state.value = ProductFormState(
+      categories: _state.value.categories,
+      measurements: measurements,
+      hasMeasurements: measurements.isNotEmpty,
+      isEditing: _state.value.isEditing,
+      error: _state.value.error,
+    );
+  }
+
   void handleAddProduct() {
-    final description = _descriptionCtrl.text.trim();
-    final unitPerPackage = int.parse(
-      _packageUnitsCtrl.text.trim().isEmpty
-          ? '0'
-          : _packageUnitsCtrl.text.trim(),
-    );
-    final amountPerUnit = double.parse(
-      _amountCtrl.text.trim().isEmpty ? '0' : _amountCtrl.text.trim(),
-    );
-    final measurement = _measureCtrl.value[0];
-    final price = double.parse(
-      _priceCtrl.text.trim().isEmpty ? '0' : _priceCtrl.text.trim(),
-    );
-
-    final product = Product(
-      description: description,
-      unitPerPackage: unitPerPackage,
-      amountPerUnit: amountPerUnit,
-      measurement: measurement,
-      price: price,
-    );
-
+    final (valid, product) = _formController.validate();
+    if (!valid) {
+      return;
+    }
     print(product);
   }
 
-  @override
   void handleBack() {
     _context.pop();
+  }
+
+  void dispose() {
+    _formController.dispose();
+    _calculatorViewModel.state.removeListener(_listenCalculatorState);
   }
 }

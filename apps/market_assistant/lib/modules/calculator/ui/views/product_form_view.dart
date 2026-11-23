@@ -1,36 +1,18 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:native_scope/native_scope.dart';
 import 'package:ui/ui.dart';
 
 import '../../domain/measurement.dart';
 
-abstract interface class ProductFormViewModel extends ChangeNotifier {
-  List<MeasurementCategory> get categories;
-  List<Measurement>? get measurements;
-
-  bool get hasMeasurements;
-
-  TextEditingController get descriptionCtrl;
-  TextEditingController get packageUnitsCtrl;
-  TextEditingController get amountCtrl;
-  ListEditingController<MeasurementCategory> get categoryCtrl;
-  ListEditingController<Measurement> get measureCtrl;
-  TextEditingController get priceCtrl;
-
-  bool get isEditing;
-
-  void handleSelectCategory(List<MeasurementCategory> elements);
-
-  void handleBack();
-  void handleAddProduct();
-}
+import '../states/product_form_state.dart';
+import '../view_models/product_form_view_model.dart';
 
 final class ProductFormView extends StatelessWidget {
-  final ProductFormViewModel _viewModel;
-
-  const ProductFormView({super.key, required this._viewModel});
+  const ProductFormView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = ScopeInjector.read<ProductFormViewModel>(context);
     final theme = context.uiTheme;
 
     return Scaffold(
@@ -49,16 +31,15 @@ final class ProductFormView extends StatelessWidget {
           top: false,
           child: Column(
             children: [
-              UiHeader(
-                priority: _viewModel.isEditing
-                    ? UiPriority.danger
-                    : UiPriority.secondary,
-                title: _viewModel.isEditing
-                    ? 'Editando producto'
-                    : 'Agregando producto',
-                leadingIcon: Icons.arrow_back_ios_new,
-                onLeadingIconPressed: _viewModel.handleBack,
-                hasOffset: true,
+              ScopeBuilder<ProductFormState, bool>(
+                selector: (state) => state.isEditing,
+                builder: (context, value, child) => UiHeader(
+                  priority: value ? UiPriority.danger : UiPriority.secondary,
+                  title: value ? 'Editando producto' : 'Agregando producto',
+                  leadingIcon: Icons.arrow_back_ios_new,
+                  onLeadingIconPressed: viewModel.handleBack,
+                  hasOffset: true,
+                ),
               ),
               Flexible(
                 child: Padding(
@@ -73,82 +54,172 @@ final class ProductFormView extends StatelessWidget {
                           child: Column(
                             spacing: theme.getSpacing(UiSpacing.lg),
                             children: [
-                              UiFieldLayout(
-                                title: 'Descripción del producto',
-                                child: UiField(
-                                  priority: _viewModel.isEditing
-                                      ? UiPriority.danger
-                                      : UiPriority.secondary,
-                                  placeholder: 'nombre o distintivo',
-                                  controller: _viewModel.descriptionCtrl,
+                              ScopeBuilder<
+                                ProductFormState,
+                                (bool, bool, String?)
+                              >(
+                                selector: (state) => (
+                                  state.isEditing,
+                                  state.error.description != null,
+                                  state.error.description,
                                 ),
+                                builder: (context, value, child) =>
+                                    UiFieldLayout(
+                                      title: 'Descripción del producto',
+                                      hasError: value.$2,
+                                      hint: value.$3,
+                                      child: UiField(
+                                        priority: value.$1
+                                            ? UiPriority.danger
+                                            : UiPriority.secondary,
+                                        placeholder: 'nombre o distintivo',
+                                        controller: viewModel
+                                            .formController
+                                            .descriptionCtrl,
+                                      ),
+                                    ),
                               ),
-                              UiFieldLayout(
-                                title: 'Unidades en el paquete',
-                                hint: 'si no cuenta con cantidad por paquete',
-                                child: UiField(
-                                  priority: _viewModel.isEditing
-                                      ? UiPriority.danger
-                                      : UiPriority.secondary,
-                                  placeholder: 'unidades en el paquete',
-                                  type: UiFieldType.number,
-                                  controller: _viewModel.packageUnitsCtrl,
+                              ScopeBuilder<
+                                ProductFormState,
+                                (bool, bool, String?)
+                              >(
+                                selector: (state) => (
+                                  state.isEditing,
+                                  state.error.packageUnits != null,
+                                  state.error.packageUnits,
                                 ),
+                                builder:
+                                    (context, value, child) => UiFieldLayout(
+                                      title: 'Unidades en el paquete',
+                                      hasError: value.$2,
+                                      hint: value.$3 ?? 'si no cuenta con cantidad por paquete',
+                                      child: UiField(
+                                        priority: value.$1
+                                            ? UiPriority.danger
+                                            : UiPriority.secondary,
+                                        placeholder: 'unidades en el paquete',
+                                        type: UiFieldType.number,
+                                        controller: viewModel
+                                            .formController
+                                            .packageUnitsCtrl,
+                                      ),
+                                    ),
                               ),
-                              UiFieldLayout(
-                                title: 'Cantidad por unidad en el paquete',
-                                hint: 'o cantidad por paquete si aplica',
-                                child: UiField(
-                                  priority: _viewModel.isEditing
-                                      ? UiPriority.danger
-                                      : UiPriority.secondary,
-                                  placeholder: 'cantidad por unidad',
-                                  type: UiFieldType.decimal,
-                                  controller: _viewModel.amountCtrl,
+                              ScopeBuilder<
+                                ProductFormState,
+                                (bool, bool, String?)
+                              >(
+                                selector: (state) => (
+                                  state.isEditing,
+                                  state.error.amount != null,
+                                  state.error.amount,
                                 ),
+                                builder: (context, value, child) =>
+                                    UiFieldLayout(
+                                      title:
+                                          'Cantidad por unidad en el paquete',
+                                      hasError: value.$2,
+                                      hint:
+                                          value.$3 ??
+                                          'o cantidad por paquete si aplica',
+                                      child: UiField(
+                                        priority: value.$1
+                                            ? UiPriority.danger
+                                            : UiPriority.secondary,
+                                        placeholder: 'cantidad por unidad',
+                                        type: UiFieldType.decimal,
+                                        controller:
+                                            viewModel.formController.amountCtrl,
+                                      ),
+                                    ),
                               ),
-                              UiFieldLayout(
-                                title: 'Categoría (unidad de medida)',
-                                child: UiSelect<MeasurementCategory>(
-                                  priority: _viewModel.isEditing
-                                      ? UiPriority.danger
-                                      : UiPriority.secondary,
-                                  placeholder: 'seleccione una categoría',
-                                  list: _viewModel.categories,
-                                  elementToText: (element) =>
-                                      element.translations[0].name,
-                                  controller: _viewModel.categoryCtrl,
-                                  onChange: _viewModel.handleSelectCategory,
+                              ScopeBuilder<
+                                ProductFormState,
+                                (bool, List<MeasurementCategory>, bool, String?)
+                              >(
+                                selector: (state) => (
+                                  state.isEditing,
+                                  state.categories,
+                                  state.error.category != null,
+                                  state.error.category,
                                 ),
+                                builder: (context, value, child) =>
+                                    UiFieldLayout(
+                                      title: 'Categoría (unidad de medida)',
+                                      hasError: value.$3,
+                                      hint: value.$4,
+                                      child: UiSelect<MeasurementCategory>(
+                                        priority: value.$1
+                                            ? UiPriority.danger
+                                            : UiPriority.secondary,
+                                        placeholder: 'seleccione una categoría',
+                                        list: value.$2,
+                                        elementToText: (element) =>
+                                            element.translations[0].name,
+                                        controller: viewModel
+                                            .formController
+                                            .categoryCtrl,
+                                        onChange:
+                                            viewModel.handleSelectCategory,
+                                      ),
+                                    ),
                               ),
-                              ListenableBuilder(
-                                listenable: _viewModel,
-                                builder: (context, child) => UiFieldLayout(
-                                  title: 'Unidad de medida',
-                                  child: UiSelect<Measurement>(
-                                    priority: _viewModel.isEditing
-                                        ? UiPriority.danger
-                                        : UiPriority.secondary,
-                                    placeholder:
-                                        'seleccione la unidad de medida',
-                                    list: _viewModel.measurements,
-                                    elementToText: (element) =>
-                                        element.translations[0].plural,
-                                    controller: _viewModel.measureCtrl,
-                                    disabled: !_viewModel.hasMeasurements,
-                                  ),
+                              ScopeBuilder<
+                                ProductFormState,
+                                (bool, List<Measurement>, bool, bool, String?)
+                              >(
+                                selector: (state) => (
+                                  state.isEditing,
+                                  state.measurements,
+                                  state.hasMeasurements,
+                                  state.error.measure != null,
+                                  state.error.measure,
                                 ),
+                                builder: (context, value, child) =>
+                                    UiFieldLayout(
+                                      title: 'Unidad de medida',
+                                      hasError: value.$4,
+                                      hint: value.$5,
+                                      child: UiSelect<Measurement>(
+                                        priority: value.$1
+                                            ? UiPriority.danger
+                                            : UiPriority.secondary,
+                                        placeholder:
+                                            'seleccione la unidad de medida',
+                                        list: value.$2,
+                                        elementToText: (element) =>
+                                            element.translations[0].plural,
+                                        controller: viewModel
+                                            .formController
+                                            .measureCtrl,
+                                        disabled: !value.$3,
+                                      ),
+                                    ),
                               ),
-                              UiFieldLayout(
-                                title: 'Precio por paquete',
-                                child: UiField(
-                                  priority: _viewModel.isEditing
-                                      ? UiPriority.danger
-                                      : UiPriority.secondary,
-                                  placeholder: 'en moneda local',
-                                  type: UiFieldType.decimal,
-                                  controller: _viewModel.priceCtrl,
+                              ScopeBuilder<
+                                ProductFormState,
+                                (bool, bool, String?)
+                              >(
+                                selector: (state) => (
+                                  state.isEditing,
+                                  state.error.price != null,
+                                  state.error.price,
                                 ),
+                                builder: (context, value, child) =>
+                                    UiFieldLayout(
+                                      title: 'Precio por paquete',
+                                      hasError: value.$2,
+                                      hint: value.$3,
+                                      child: UiField(
+                                        priority: value.$1
+                                            ? UiPriority.danger
+                                            : UiPriority.secondary,
+                                        placeholder: 'en moneda local',
+                                        type: UiFieldType.decimal,
+                                        controller:
+                                            viewModel.formController.priceCtrl,
+                                      ),
+                                    ),
                               ),
                             ],
                           ),
@@ -156,21 +227,24 @@ final class ProductFormView extends StatelessWidget {
                       ),
                       SizedBox(
                         width: double.infinity,
-                        child: UiButton(
-                          onPressed: _viewModel.handleAddProduct,
-                          priority: _viewModel.isEditing
-                              ? UiPriority.danger
-                              : UiPriority.secondary,
-                          vertical: UiSpacing.md,
-                          radius: UiRadius.xl,
-                          child: UiLabel(
-                            text: _viewModel.isEditing
-                                ? 'Finalizar actualización'
-                                : 'Agregar producto',
-                            priority: _viewModel.isEditing
+                        child: ScopeBuilder<ProductFormState, bool>(
+                          selector: (state) => state.isEditing,
+                          builder: (context, value, child) => UiButton(
+                            onPressed: viewModel.handleAddProduct,
+                            priority: value
                                 ? UiPriority.danger
                                 : UiPriority.secondary,
-                            style: UiFontStyle.caption,
+                            vertical: UiSpacing.md,
+                            radius: UiRadius.xl,
+                            child: UiLabel(
+                              text: value
+                                  ? 'Finalizar actualización'
+                                  : 'Agregar producto',
+                              priority: value
+                                  ? UiPriority.danger
+                                  : UiPriority.secondary,
+                              style: UiFontStyle.caption,
+                            ),
                           ),
                         ),
                       ),
