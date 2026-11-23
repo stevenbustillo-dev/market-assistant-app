@@ -31,6 +31,7 @@ final class ProductFormViewModel {
     required this._measurementRepository,
   }) : _state = ValueNotifier<ProductFormState>(
          const ProductFormState(
+           category: null,
            categories: [],
            measurements: [],
            hasMeasurements: false,
@@ -51,6 +52,7 @@ final class ProductFormViewModel {
     ProductFormErrorModel Function(ProductFormErrorModel error) setError,
   ) {
     _state.value = _state.value = ProductFormState(
+      category: _state.value.category,
       categories: _state.value.categories,
       measurements: _state.value.measurements,
       hasMeasurements: _state.value.hasMeasurements,
@@ -62,17 +64,25 @@ final class ProductFormViewModel {
   void initState() {
     _formController.initState(_setError);
 
+    final hasSelectedCategory =
+        _calculatorViewModel.state.value.category != null;
+
     _state.value = ProductFormState(
+      category: _calculatorViewModel.state.value.category,
       categories: _measurementRepository.getAllMeasurementCategory(),
-      measurements: _state.value.measurements,
-      hasMeasurements: _state.value.hasMeasurements,
+      measurements: hasSelectedCategory
+          ? _calculatorViewModel.state.value.category!.measurements
+          : _state.value.measurements,
+      hasMeasurements: hasSelectedCategory,
       isEditing: _state.value.isEditing,
       error: _state.value.error,
     );
-    _calculatorViewModel.state.addListener(_listenCalculatorState);
+    if (_calculatorViewModel.state.value.category != null) {
+      formController.categoryCtrl.add(
+        _calculatorViewModel.state.value.category!,
+      );
+    }
   }
-
-  void _listenCalculatorState() {}
 
   void handleSelectCategory(List<MeasurementCategory> elements) {
     formController.measureCtrl.clear();
@@ -81,6 +91,7 @@ final class ProductFormViewModel {
         : elements[0].measurements;
 
     _state.value = ProductFormState(
+      category: _state.value.category,
       categories: _state.value.categories,
       measurements: measurements,
       hasMeasurements: measurements.isNotEmpty,
@@ -106,6 +117,5 @@ final class ProductFormViewModel {
 
   void dispose() {
     _formController.dispose();
-    _calculatorViewModel.state.removeListener(_listenCalculatorState);
   }
 }

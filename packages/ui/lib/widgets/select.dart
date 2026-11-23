@@ -28,6 +28,7 @@ final class UiSelect<T> extends StatefulWidget {
   final UiRadius radius;
 
   final String? placeholder;
+  final bool readOnly;
   final bool disabled;
 
   final Widget Function(bool focused)? prefix;
@@ -52,6 +53,7 @@ final class UiSelect<T> extends StatefulWidget {
     this.radius = UiRadius.sm,
 
     this.placeholder,
+    this.readOnly = false,
     this.disabled = false,
 
     this.prefix,
@@ -305,7 +307,7 @@ final class _UiSelectState<T> extends State<UiSelect<T>> {
       placeholder: widget.placeholder,
       readOnly: true,
       disabled: widget.disabled,
-      onTap: () => _handleShowDialog(context),
+      onTap: widget.readOnly ? null : () => _handleShowDialog(context),
       prefix: widget.prefix,
       suffix: (focused) => Padding(
         padding: EdgeInsetsGeometry.only(right: theme.getSpacing(UiSpacing.sm)),

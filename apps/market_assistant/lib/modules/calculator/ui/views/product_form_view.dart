@@ -135,19 +135,30 @@ final class ProductFormView extends StatelessWidget {
                               ),
                               ScopeBuilder<
                                 ProductFormState,
-                                (bool, List<MeasurementCategory>, bool, String?)
+                                (
+                                  bool,
+                                  List<MeasurementCategory>,
+                                  bool,
+                                  String?,
+                                  bool,
+                                )
                               >(
                                 selector: (state) => (
                                   state.isEditing,
                                   state.categories,
                                   state.error.category != null,
                                   state.error.category,
+                                  state.category != null,
                                 ),
                                 builder: (context, value, child) =>
                                     UiFieldLayout(
                                       title: 'Categoría (unidad de medida)',
                                       hasError: value.$3,
-                                      hint: value.$4,
+                                      hint:
+                                          value.$4 ??
+                                          (value.$5
+                                              ? 'preseleccionado para comparar productos'
+                                              : null),
                                       child: UiSelect<MeasurementCategory>(
                                         priority: value.$1
                                             ? UiPriority.danger
@@ -161,6 +172,7 @@ final class ProductFormView extends StatelessWidget {
                                             .categoryCtrl,
                                         onChange:
                                             viewModel.handleSelectCategory,
+                                        readOnly: value.$5,
                                       ),
                                     ),
                               ),

@@ -48,7 +48,7 @@ final class CalculatorViewModel {
     Product? best;
     for (var product in products) {
       best ??= product;
-      if (product.calculatePricePerAmount() > best.calculatePricePerAmount()) {
+      if (product.calculatePricePerAmount() < best.calculatePricePerAmount()) {
         best = product;
       }
     }
