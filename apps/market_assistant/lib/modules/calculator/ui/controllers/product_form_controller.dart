@@ -43,7 +43,7 @@ final class ProductFormController {
     priceCtrl.addListener(_validatePrice);
   }
 
-  (bool, String) _validateDescription() {
+  (bool, String?, String) _validateDescription() {
     final value = descriptionCtrl.text.trim();
     final error = value.isEmpty ? 'la descripción es requerida' : null;
     _setError(
@@ -56,12 +56,12 @@ final class ProductFormController {
         price: currentError.price,
       ),
     );
-    return (error == null, (error ?? value));
+    return (error == null, error, value);
   }
 
-  (bool, String) _validatePackageUnits() {
-    final value = packageUnitsCtrl.text.trim();
-    final error = value.isEmpty
+  (bool, String?, int) _validatePackageUnits() {
+    final value = int.tryParse(packageUnitsCtrl.text.trim()) ?? 0;
+    final error = value == 0
         ? 'las unudades en el paquete son requeridas'
         : null;
     _setError(
@@ -74,12 +74,12 @@ final class ProductFormController {
         price: currentError.price,
       ),
     );
-    return (error == null, (error ?? value));
+    return (error == null, error, value);
   }
 
-  (bool, String) _validateAmount() {
-    final value = amountCtrl.text.trim();
-    final error = value.isEmpty
+  (bool, String?, double) _validateAmount() {
+    final value = double.tryParse(amountCtrl.text.trim()) ?? 0.0;
+    final error = value == 0.0
         ? 'la cantidad por unidad o por paquete es requerida'
         : null;
     _setError(
@@ -92,10 +92,10 @@ final class ProductFormController {
         price: currentError.price,
       ),
     );
-    return (error == null, (error ?? value));
+    return (error == null, error, value);
   }
 
-  (bool, String, MeasurementCategory) _validateCategory() {
+  (bool, String?, MeasurementCategory) _validateCategory() {
     final value = categoryCtrl.value;
     final error = value.isEmpty ? 'la categoría es requerida' : null;
     _setError(
@@ -108,10 +108,10 @@ final class ProductFormController {
         price: currentError.price,
       ),
     );
-    return (error == null, error ?? '', value[0]);
+    return (error == null, error, value[0]);
   }
 
-  (bool, String, Measurement) _validateMeasure() {
+  (bool, String?, Measurement) _validateMeasure() {
     final value = measureCtrl.value;
     final error = value.isEmpty ? 'la unidad de medida es requerida' : null;
     _setError(
@@ -124,12 +124,12 @@ final class ProductFormController {
         price: currentError.price,
       ),
     );
-    return (error == null, error ?? '', value[0]);
+    return (error == null, error, value[0]);
   }
 
-  (bool, String) _validatePrice() {
-    final value = priceCtrl.text.trim();
-    final error = value.isEmpty ? 'el precio por paquete es requerido' : null;
+  (bool, String?, double) _validatePrice() {
+    final value = double.tryParse(priceCtrl.text.trim()) ?? 0.0;
+    final error = value == 0.0 ? 'el precio por paquete es requerido' : null;
     _setError(
       (currentError) => ProductFormErrorModel(
         description: currentError.description,
@@ -140,11 +140,50 @@ final class ProductFormController {
         price: error,
       ),
     );
-    return (error == null, (error ?? value));
+    return (error == null, error, value);
   }
 
-  (bool, Product?) validate() {
-    return (false, null);
+  (bool, MeasurementCategory?, Measurement?, Product?) validate() {
+    final notValid = (false, null, null, null);
+
+    final (isDescriptionValid, _, descriptionValue) = _validateDescription();
+    if (!isDescriptionValid) {
+      return notValid;
+    }
+    final (isPackageUnitsValid, _, packageUnitsValue) = _validatePackageUnits();
+    if (!isPackageUnitsValid) {
+      return notValid;
+    }
+    final (isAmountValid, _, amountValue) = _validateAmount();
+    if (!isAmountValid) {
+      return notValid;
+    }
+    final (isCategoryValid, _, categoryValue) = _validateCategory();
+    if (!isCategoryValid) {
+      return notValid;
+    }
+    final (isMeasureValid, _, measureValue) = _validateMeasure();
+    if (!isMeasureValid) {
+      return notValid;
+    }
+    final (isPriceValid, _, priceValue) = _validatePrice();
+    if (!isPriceValid) {
+      return notValid;
+    }
+
+    final baseMeasurement = categoryValue.measurements.firstWhere(
+      (element) => element.isBase,
+    );
+
+    final product = Product(
+      description: descriptionValue,
+      price: priceValue,
+      unitPerPackage: packageUnitsValue,
+      amountPerUnit: amountValue,
+      measurement: measureValue,
+    );
+
+    return (true, categoryValue, baseMeasurement, product);
   }
 
   void dispose() {

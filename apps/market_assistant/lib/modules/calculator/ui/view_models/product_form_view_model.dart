@@ -90,11 +90,14 @@ final class ProductFormViewModel {
   }
 
   void handleAddProduct() {
-    final (valid, product) = _formController.validate();
+    final (valid, category, baseMeasurement, product) = _formController
+        .validate();
     if (!valid) {
       return;
     }
-    print(product);
+    FocusManager.instance.primaryFocus?.unfocus();
+    _calculatorViewModel.addProduct(category!, baseMeasurement!, product!);
+    handleBack();
   }
 
   void handleBack() {
