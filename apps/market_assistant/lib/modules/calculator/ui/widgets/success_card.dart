@@ -1,3 +1,4 @@
+import 'package:market_assistant/modules/core/ui/utils/format.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:ui/ui.dart';
 
@@ -113,12 +114,14 @@ final class SuccessCard extends StatelessWidget {
                   text: product!.description,
                   priority: UiPriority.secondary,
                   style: UiFontStyle.caption,
+                  maxLines: 1,
+                  overflow: .ellipsis,
                 ),
                 Align(
                   alignment: AlignmentGeometry.centerEnd,
                   child: UiLabel(
                     text:
-                        '\$${product!.calculatePricePerAmount().toStringAsPrecision(2)} / ${baseMeasurement!.translations[0].singular}',
+                        '\$ ${formatNumber(product!.calculatePricePerAmount(), 4)} / ${baseMeasurement!.translations[0].singular}',
                     priority: UiPriority.secondary,
                     style: UiFontStyle.body,
                     accent: true,

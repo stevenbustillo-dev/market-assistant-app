@@ -3,11 +3,13 @@ import 'package:native_scope/native_scope.dart';
 import 'package:ui/ui.dart';
 
 import '../../domain/product.dart';
+import '../../domain/measurement.dart';
 
 import '../states/comparison_state.dart';
 import '../view_models/comparison_view_model.dart';
 
 import '../widgets/success_card.dart';
+import '../widgets/product_list_item.dart';
 
 final class ComparisonView extends StatelessWidget {
   const ComparisonView({super.key});
@@ -159,14 +161,20 @@ final class ComparisonView extends StatelessWidget {
             ],
           ),
           Flexible(
-            child: ScopeBuilder<ComparisonState, List<Product>>(
-              selector: (state) => state.products,
+            child: ScopeBuilder<ComparisonState, (List<Product>, Measurement)>(
+              selector: (state) => (state.products, state.baseMeasurement!),
               builder: (context, value, child) => ListView.separated(
-                itemBuilder: (context, index) =>
-                    UiLabel(text: value[index].description),
+                itemBuilder: (context, index) => ProductListItem(
+                  product: value.$1[index],
+                  baseMeasurement: value.$2,
+                  onRemove: () => viewModel.handleRemoveProduct(index),
+                ),
                 separatorBuilder: (context, index) =>
                     SizedBox(height: theme.getSpacing(UiSpacing.sm)),
-                itemCount: value.length,
+                itemCount: value.$1.length,
+                padding: EdgeInsets.symmetric(
+                  vertical: theme.getSpacing(UiSpacing.xs),
+                ),
               ),
             ),
           ),

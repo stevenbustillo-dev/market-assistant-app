@@ -34,7 +34,7 @@ final class ProductFormView extends StatelessWidget {
               ScopeBuilder<ProductFormState, bool>(
                 selector: (state) => state.isEditing,
                 builder: (context, value, child) => UiHeader(
-                  priority: value ? UiPriority.danger : UiPriority.secondary,
+                  priority: UiPriority.primary,
                   title: value ? 'Editando producto' : 'Agregando producto',
                   leadingIcon: Icons.arrow_back_ios_new,
                   onLeadingIconPressed: viewModel.handleBack,
@@ -71,7 +71,7 @@ final class ProductFormView extends StatelessWidget {
                                       child: UiField(
                                         priority: value.$1
                                             ? UiPriority.danger
-                                            : UiPriority.secondary,
+                                            : UiPriority.primary,
                                         placeholder: 'nombre o distintivo',
                                         controller: viewModel
                                             .formController
@@ -96,7 +96,7 @@ final class ProductFormView extends StatelessWidget {
                                       child: UiField(
                                         priority: value.$1
                                             ? UiPriority.danger
-                                            : UiPriority.secondary,
+                                            : UiPriority.primary,
                                         placeholder: 'unidades en el paquete',
                                         type: UiFieldType.number,
                                         controller: viewModel
@@ -125,7 +125,7 @@ final class ProductFormView extends StatelessWidget {
                                       child: UiField(
                                         priority: value.$1
                                             ? UiPriority.danger
-                                            : UiPriority.secondary,
+                                            : UiPriority.primary,
                                         placeholder: 'cantidad por unidad',
                                         type: UiFieldType.decimal,
                                         controller:
@@ -162,7 +162,7 @@ final class ProductFormView extends StatelessWidget {
                                       child: UiSelect<MeasurementCategory>(
                                         priority: value.$1
                                             ? UiPriority.danger
-                                            : UiPriority.secondary,
+                                            : UiPriority.primary,
                                         placeholder: 'seleccione una categoría',
                                         list: value.$2,
                                         elementToText: (element) =>
@@ -195,7 +195,7 @@ final class ProductFormView extends StatelessWidget {
                                       child: UiSelect<Measurement>(
                                         priority: value.$1
                                             ? UiPriority.danger
-                                            : UiPriority.secondary,
+                                            : UiPriority.primary,
                                         placeholder:
                                             'seleccione la unidad de medida',
                                         list: value.$2,
@@ -225,7 +225,7 @@ final class ProductFormView extends StatelessWidget {
                                       child: UiField(
                                         priority: value.$1
                                             ? UiPriority.danger
-                                            : UiPriority.secondary,
+                                            : UiPriority.primary,
                                         placeholder: 'en moneda local',
                                         type: UiFieldType.decimal,
                                         controller:
@@ -243,9 +243,7 @@ final class ProductFormView extends StatelessWidget {
                           selector: (state) => state.isEditing,
                           builder: (context, value, child) => UiButton(
                             onPressed: viewModel.handleAddProduct,
-                            priority: value
-                                ? UiPriority.danger
-                                : UiPriority.secondary,
+                            priority: UiPriority.primary,
                             vertical: UiSpacing.md,
                             radius: UiRadius.xl,
                             child: UiLabel(
@@ -254,7 +252,7 @@ final class ProductFormView extends StatelessWidget {
                                   : 'Agregar producto',
                               priority: value
                                   ? UiPriority.danger
-                                  : UiPriority.secondary,
+                                  : UiPriority.primary,
                               style: UiFontStyle.caption,
                             ),
                           ),
